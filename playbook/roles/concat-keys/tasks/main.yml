@@ -1,0 +1,30 @@
+---
+
+# exports in authorized_keys a list of authorized keys for the specified deploy_env
+- name: Create concatenated keys file
+  local_action: command mktemp /tmp/config-ssh-keys.XXXXXXXX
+  register: tmp_ssh_keys
+  run_once: True
+
+- name: Populate keys for environment
+  shell: "for f in {{ role_path }}/public-keys/*.pub; do (cat $f; echo '') >> {{ tmp_ssh_keys.stdout }}; done"
+  delegate_to: localhost
+  run_once: True
+
+- name: read key contents
+  shell: "cat {{ tmp_ssh_keys.stdout }}"
+  register: authorized_keys_output
+  delegate_to: localhost
+  run_once: True
+
+- name: Export list of authorized_keys
+  set_fact:
+    authorized_keys: "{{ authorized_keys_output.stdout_lines }}"
+  run_once: True
+
+- name: Delete temp file
+  local_action:
+    module: file
+    name: "{{ tmp_ssh_keys.stdout }}"
+    state: absent
+  run_once: True

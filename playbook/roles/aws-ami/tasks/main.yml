@@ -1,0 +1,68 @@
+---
+- name: upgrade all packages
+  yum:
+    name: '*'
+    state: latest
+
+- name: install RHEL's Extra Package Repository
+  yum: 
+    name: epel-release 
+    state: latest
+
+- name: set timezone
+  file: src=/usr/share/zoneinfo/{{ timezone | default("America/New_York") }} dest=/etc/localtime owner=root group=root state=link force=true
+
+- name: install Network Time Protocol (NTP) daemon
+  yum: 
+    name: ntp 
+    state: latest
+
+- name: make sure NTP is started up
+  service: 
+    name: ntpd 
+    state: started 
+    enabled: true
+
+- name: install selinux bindings
+  yum: 
+    name: libselinux-python 
+    state: present
+
+- name: install yum-cron
+  yum: 
+    name: yum-cron 
+    state: latest
+
+- name: configure yum-cron for security updates
+  lineinfile: create=True 
+              dest=/etc/yum/yum-cron.conf 
+              regexp=update_cmd 
+              line='update_cmd = security'
+
+- name: configure yum-cron to automatically apply updates.
+  lineinfile: create=True 
+              dest=/etc/yum/yum-cron.conf 
+              regexp=apply_updates 
+              line='apply_updates = yes'
+
+- name: start yum-cron
+  service:
+    name: yum-cron
+    state: started
+    enabled: yes # start on boot
+
+- name: set ulimit
+  copy: src=files/limits.conf dest=/etc/security/limits.conf owner=root group=root force=true
+
+# http://linux.uits.uconn.edu/2014/06/25/ssh-weak-ciphers-and-mac-algorithms/
+- name: Change ssh ciphers
+  lineinfile: dest=/etc/ssh/sshd_config
+              regexp="^Ciphers\s"
+              line="Ciphers aes128-ctr,aes192-ctr,aes256-ctr"
+              state=present
+
+- name: Change ssh MACs
+  lineinfile: dest=/etc/ssh/sshd_config
+              regexp="^MACs\s"
+              line="MACs hmac-sha1,hmac-ripemd160"
+              state=present

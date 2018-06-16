@@ -1,0 +1,32 @@
+---
+##
+# Creates an AMI with Google PAM. This is done to allow secure ssh with two factor authentication.
+#
+# What it does:
+#
+# 1. Create new EC2 instance_type
+# 2. Install/Update yum dependencies
+##
+- hosts: local
+  connection: local
+  
+  vars_files:
+    - "vault/aws-config.yml"
+  
+  roles:
+    - role: concat-keys
+
+    - role: aws-user-key
+      keys_contents: "{{ authorized_keys | join('\n') }}"
+
+    - role: aws-launch
+      playbook_group: "tmp_ami_group"
+      ami_user: "{{ launch_user }}"
+      user_data: "{{ launch_user_init_script }}"
+
+- name: Update all packages in a launched EC2 instance.
+  hosts: tmp_ami_group
+  become_user: root
+  become: true
+  roles:
+    - role: aws-ami

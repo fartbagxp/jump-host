@@ -1,0 +1,33 @@
+---
+##
+# Exports a script that can be used to bootstrap an EC2 instance with the
+# specified user and authorized ssh keys via user data
+# http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/user-data.html
+#
+# This is the only way to allow access to newly launched EC2 instances
+# without sharing the AWS keypair (e.g., for Ansible AMI baking playbooks).
+##
+- name: Create concatenated keys file
+  local_action: command mktemp /tmp/launch-user-ssh-keys.XXXXXXXX
+  register: tmp_ssh_keys
+
+- name: Populate concatenated keys file from variable contents
+  local_action:
+    module: copy
+    content: "{{ keys_contents }}"
+    dest: "{{ tmp_ssh_keys.stdout }}"
+  when: keys_contents is defined
+
+- name: Export keys variable
+  set_fact:
+    launch_user_authorized_keys: "{{ lookup('file', tmp_ssh_keys.stdout) }}"
+
+- name: Export launch user create script
+  set_fact:
+    launch_user_init_script: "{{ lookup('template', 'create_launch_user.sh') }}"
+
+- name: Delete temp file.
+  local_action:
+    module: file
+    name: "{{ tmp_ssh_keys.stdout }}"
+  state: absent

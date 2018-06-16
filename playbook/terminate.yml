@@ -1,0 +1,36 @@
+---
+- name: Terminate EC2 instances
+  hosts: localhost
+  connection: local
+  gather_facts: no
+  
+  vars_files:
+    - "vault/aws-config.yml"
+
+  vars:
+    aws_region: "{{ region }}"
+    ec2_tags:
+      Name: "{{ app_name }}"
+      
+  tasks:
+    - name: Filter EC2 instances
+      ec2_instance_facts:
+        region: "{{ aws_region }}"
+        filters:
+          "tag:Name": "{{ app_name }}"
+      register: hosts
+
+    - name: Show var
+      debug: var=hosts.instances[0].instance_id
+
+    - name: Show vars
+      debug: var=item.instance_id
+      with_items: "{{ hosts.instances }}"
+
+    - name: Terminate EC2 server
+      ec2:
+        region: "{{ aws_region }}"
+        instance_ids: "{{ item.instance_id }}"
+        state: 'absent'
+      when: item.state.name == "running"
+      with_items: "{{ hosts.instances }}"

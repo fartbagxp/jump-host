@@ -18,11 +18,16 @@ Let's prototype how to build something like this.
 
 1. A simple instance supporting SSH key + Google PAM for multiple user.
 1. Every time a new user is added, redeploy the jump host.
+1. Every time a user is removed, redeploy the jump host.
+1. Only generate the user's PAM if it's not among the files within the box.
 
 ## Questions to Answer
 
-1. Recovery: Delete the user and recreate a new user.
+1. `How to Recover?` Delete the user and recreate a new user.
 
+1. `Where to store Google PAM file?` Probably S3, and encrypted at REST with the key in AWS KMS.
+
+1. `
 
 ## Resources
 

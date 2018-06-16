@@ -1,0 +1,47 @@
+---
+  - name: echo
+    debug: msg="launching '{{ instance_name }}' to {{ region }} from base image {{ ami_id }}"
+
+  - name: Launch new instance
+    ec2:
+      aws_access_key: "{{ aws_access_key }}"
+      aws_secret_key: "{{ aws_secret_key }}"
+      region: "{{ region }}"
+      vpc_subnet_id: "{{ vpc_subnet_id }}"
+      group_id: "{{ security_groups }}"
+      image: "{{ ami_id }}"
+      instance_type: "{{ instance_type }}"
+      instance_tags: "{{ instance_tags }}"
+      instance_profile_name: "{{ instance_role|default('') }}"
+      wait: yes
+      assign_public_ip: yes
+      count: 1
+      user_data: "{{ user_data }}"
+    register: ec2_result
+
+  - name: register a single ec2 instance result
+    set_fact:
+      launched_instance: "{{ ec2_result.instances[0] }}"
+
+  - name: Wait for SSH port 22 to become available
+    wait_for:
+      host: "{{ launched_instance.public_ip }}"
+      port: 22
+      timeout: 300
+      state: started
+
+  - name: Wait until the user can log into the host (retry every 5 seconds up to 3 minutes)
+    command: ssh -oStrictHostKeyChecking=no {{ ami_user }}@{{ launched_instance.public_ip }} exit
+    register: ssh_output
+    until: ssh_output.rc == 0
+    retries: 36
+    delay: 5
+
+  - name: add new instance to {{playbook_group|default('specified group')}} so application playbook can be applied
+    add_host: 
+      hostname: "{{ launched_instance.public_ip }}" 
+      groups: "{{ playbook_group }}" 
+      ansible_ssh_user: "{{ ami_user }}" 
+      ec2_id: "{{ launched_instance.id }}" 
+      ec2_name: "{{ launched_instance.tags['Name'] }}"
+    when: playbook_group is defined
