@@ -13,7 +13,7 @@
 # The host itself is cycled everyday. Thus, it makes little sense to have emergency codes.
 - name: modify PAM auth files to delete emergency codes
   lineinfile:
-    path: /home/fartbagxp/.google_authenticator
+    path: /home/user1/.google_authenticator
     state: absent
     regexp: '[0-9]{8}'
 
@@ -24,10 +24,5 @@
   shell: echo ''
 
 - name: Retrieve generated keys from server
-  fetch: src=/home/fartbagxp/.google_authenticator
+  fetch: src=/home/user1/.google_authenticator
          dest=/tmp/google-auth-files
-  when: ansible_ssh_user != "ec2-user"
-
-- pause: seconds=5
-         prompt="Your Google Authentication keys are in /tmp/google-auth-files. Press any key to continue..."
-  when: ansible_ssh_user != "ec2-user"

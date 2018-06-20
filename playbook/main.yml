@@ -28,12 +28,12 @@
   roles:
     - role: aws-ami
 
-# - name: setup PAM for 2FA authentication for every user
-#   hosts: tmp_ami_group
-#   gather_facts: no
-#   roles:
-#     - role: pam-user
+- name: setup PAM for 2FA authentication for every user
+  hosts: tmp_ami_group
+  gather_facts: no
+  roles:
+    - role: pam-user
 
-# - name: setup configuration for ssh daemon for PAM only access
-#   hosts: tmp_ami_group
-#   gather_facts: no
+- name: setup configuration for ssh daemon for PAM only access
+  hosts: tmp_ami_group
+  gather_facts: no

@@ -8,6 +8,8 @@ This is an example of a jump host / bastion with an attempt on secure hardening 
 
 ## Setup
 
+1. Install [credstash](https://github.com/fugue/credstash)
+
 ```sh
 virtualenv .
 source ./bin/activate
@@ -20,7 +22,7 @@ pip install ansible
 1. `/etc/ssh/sshd_config` is the SSH daemon configuration.
 1. `~/.google-authenticator` or `/home/<user>/.google_authenticator` is the secret key file for the local user's Google PAM.
 
-## Prototype
+## High Level
 
 Let's prototype how to build something like this.
 
@@ -28,6 +30,14 @@ Let's prototype how to build something like this.
 1. Every time a new user is added, redeploy the jump host.
 1. Every time a user is removed, redeploy the jump host.
 1. Only generate the user's PAM if it's not among the files within the box.
+
+## Details
+
+1. Setup the server with SSH access for every user provided public key.
+1. Pull [credstash](https://github.com/fugue/credstash) for all available <user,PAM auth> pair.
+1. Restore available PAM pair onto the server.
+1. Generate new PAM pair for new users without PAM pair.
+1. Store new PAM pairs into [credstash](https://github.com/fugue/credstash).
 
 ## Questions to Answer
 
