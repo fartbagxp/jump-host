@@ -1,0 +1,33 @@
+##
+# Generate PAM for every new user not found in 
+
+---
+- name: run PAM for the new user
+  shell: google-authenticator -t -d -f -r 3 -R 30 -w 17
+  no_log: true
+  register: pam
+
+# These are the new QR codes generated.
+- debug: var=pam.stdout_lines[0]
+
+# The host itself is cycled everyday. Thus, it makes little sense to have emergency codes.
+- name: modify PAM auth files to delete emergency codes
+  lineinfile:
+    path: /home/fartbagxp/.google_authenticator
+    state: absent
+    regexp: '[0-9]{8}'
+
+- name: encrypt PAM for storage (?)
+  shell: echo ''
+
+- name: upload to S3
+  shell: echo ''
+
+- name: Retrieve generated keys from server
+  fetch: src=/home/fartbagxp/.google_authenticator
+         dest=/tmp/google-auth-files
+  when: ansible_ssh_user != "ec2-user"
+
+- pause: seconds=5
+         prompt="Your Google Authentication keys are in /tmp/google-auth-files. Press any key to continue..."
+  when: ansible_ssh_user != "ec2-user"

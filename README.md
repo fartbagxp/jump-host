@@ -6,6 +6,14 @@ Sometimes, we need secured access to these servers through a publicly exposed in
 
 This is an example of a jump host / bastion with an attempt on secure hardening and supports Google PAM.
 
+## Setup
+
+```sh
+virtualenv .
+source ./bin/activate
+pip install ansible
+```
+
 ## Files to be aware of
 
 1. `/etc/pam.d/sshd` is the Google PAM SSH daemon configuration.
@@ -27,7 +35,14 @@ Let's prototype how to build something like this.
 
 1. `Where to store Google PAM file?` Probably S3, and encrypted at REST with the key in AWS KMS.
 
-1. `
+1. `Is it okay for everybody on the team to know another person's PAM?` This is because when the files generated are stored in the jump host itself, and the person who ran the update will have access to all new users' PAM. 
+
+
+## TODO
+
+1. User group (don't use ec2-user)
+
+1. Use credstash for PAM generated credentials.
 
 ## Resources
 

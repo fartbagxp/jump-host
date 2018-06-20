@@ -1,0 +1,19 @@
+---
+
+- name: update sshd config to enable challenge responses
+  lineinfile: dest=/etc/ssh/sshd_config
+              regexp=^ChallengeResponseAuthentication
+              line="ChallengeResponseAuthentication yes"
+              state=present
+  notify: restart ssh
+
+- name: add Google authenticator to PAM
+  lineinfile: dest=/etc/pam.d/sshd
+              line="auth required pam_google_authenticator.so"
+              insertbefore=BOF
+              state=present
+
+- name: restart SSH
+  shell: sleep 3; /etc/init.d/sshd restart
+  async: 1
+  poll: 0

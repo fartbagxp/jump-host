@@ -1,0 +1,51 @@
+---
+##
+# Exports a script that can be used to bootstrap an EC2 instance with the
+# specified user and authorized ssh keys via user data
+# http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/user-data.html
+#
+# This is the only way to allow access to newly launched EC2 instances
+# without sharing the AWS keypair (e.g., for Ansible AMI baking playbooks).
+##
+- name: get names of file to build user list
+  find:
+    paths: "{{ role_path }}/public-keys"
+    patterns: "*.pub"
+  register: files_matched
+
+- name: store user paths
+  set_fact:
+    matched_paths: "{{ files_matched.files | map(attribute='path') | list }}"
+
+- name: store user names
+  set_fact:
+    usernames: "{{ matched_paths | map('basename') | map('regex_replace','\\.pub','') | list }}"
+
+- name: error handling if no username is found
+  fail:
+    msg: "No username found. Check the public keys folder for *.pub files. Need at least 1."
+  failed_when: usernames|length==0
+
+- name: empty variable for storing ssh keys
+  set_fact:
+    ssh_keys: []
+
+- name: store user keys
+  set_fact:
+    ssh_keys: "{{ ssh_keys }} + {{ [ lookup('file', '{{ item }}' ) ] }}"
+  with_items: "{{ matched_paths }}"
+  no_log: true
+
+- name: joined
+  set_fact:
+    joined_keys: "{{ ssh_keys|join(',') }}"
+  no_log: true
+
+- name: export launch user create script
+  set_fact:
+    launch_user_init_script: "{{ lookup('template', 'create_launch_script.sh') }}"
+  no_log: true
+
+- name: export launch user
+  set_fact:
+    launch_user: "{{ usernames.0 }}"

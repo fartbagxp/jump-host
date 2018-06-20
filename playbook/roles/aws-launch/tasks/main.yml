@@ -1,8 +1,10 @@
 ---
-  - name: echo
+# Start launching the AMI from scratch.
+# Add the AMI to a group upon completion.
+  - name: debug state for launching new instance
     debug: msg="launching '{{ instance_name }}' to {{ region }} from base image {{ ami_id }}"
 
-  - name: Launch new instance
+  - name: launch new instance
     ec2:
       aws_access_key: "{{ aws_access_key }}"
       aws_secret_key: "{{ aws_secret_key }}"
@@ -23,14 +25,14 @@
     set_fact:
       launched_instance: "{{ ec2_result.instances[0] }}"
 
-  - name: Wait for SSH port 22 to become available
+  - name: wait for SSH port 22 to become available
     wait_for:
       host: "{{ launched_instance.public_ip }}"
       port: 22
       timeout: 300
       state: started
 
-  - name: Wait until the user can log into the host (retry every 5 seconds up to 3 minutes)
+  - name: wait until the user can log into the host (retry every 5 seconds up to 3 minutes)
     command: ssh -oStrictHostKeyChecking=no {{ ami_user }}@{{ launched_instance.public_ip }} exit
     register: ssh_output
     until: ssh_output.rc == 0

@@ -28,6 +28,11 @@
     name: libselinux-python 
     state: present
 
+- name: install Google PAM
+  yum: 
+    name: google-authenticator
+    state: latest
+
 - name: install yum-cron
   yum: 
     name: yum-cron 
@@ -55,13 +60,13 @@
   copy: src=files/limits.conf dest=/etc/security/limits.conf owner=root group=root force=true
 
 # http://linux.uits.uconn.edu/2014/06/25/ssh-weak-ciphers-and-mac-algorithms/
-- name: Change ssh ciphers
+- name: change ssh ciphers
   lineinfile: dest=/etc/ssh/sshd_config
               regexp="^Ciphers\s"
               line="Ciphers aes128-ctr,aes192-ctr,aes256-ctr"
               state=present
 
-- name: Change ssh MACs
+- name: change ssh MACs
   lineinfile: dest=/etc/ssh/sshd_config
               regexp="^MACs\s"
               line="MACs hmac-sha1,hmac-ripemd160"

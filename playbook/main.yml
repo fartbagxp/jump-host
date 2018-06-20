@@ -14,19 +14,26 @@
     - "vault/aws-config.yml"
   
   roles:
-    - role: concat-keys
-
-    - role: aws-user-key
-      keys_contents: "{{ authorized_keys | join('\n') }}"
+    - role: aws-user
 
     - role: aws-launch
       playbook_group: "tmp_ami_group"
       ami_user: "{{ launch_user }}"
       user_data: "{{ launch_user_init_script }}"
 
-- name: Update all packages in a launched EC2 instance.
+- name: update all packages in a launched EC2 instance.
   hosts: tmp_ami_group
   become_user: root
   become: true
   roles:
     - role: aws-ami
+
+# - name: setup PAM for 2FA authentication for every user
+#   hosts: tmp_ami_group
+#   gather_facts: no
+#   roles:
+#     - role: pam-user
+
+# - name: setup configuration for ssh daemon for PAM only access
+#   hosts: tmp_ami_group
+#   gather_facts: no
