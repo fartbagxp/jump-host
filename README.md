@@ -56,7 +56,7 @@ Let's prototype how to build something like this.
 
 ## Resources
 
-* [Initial Server Setup from Digital Ocean](https://www.digitalocean.com/community/tutorials/initial-server-setup-with-ubuntu-16-04)
+* [Securing SSH on Amazon Linux](https://aws.amazon.com/blogs/startups/securing-ssh-to-amazon-ec2-linux-hosts/)
 
 * [Managing Users from AWS](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/managing-users.html)
 

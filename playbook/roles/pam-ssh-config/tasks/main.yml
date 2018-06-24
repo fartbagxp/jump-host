@@ -1,16 +1,25 @@
 ---
-
 - name: update sshd config to enable challenge responses
   lineinfile: dest=/etc/ssh/sshd_config
               regexp=^ChallengeResponseAuthentication
               line="ChallengeResponseAuthentication yes"
               state=present
-  notify: restart ssh
 
-- name: add Google authenticator to PAM
+# - name: update sshd config to enable authentication methods for keyboard-interactive
+#   lineinfile: dest=/etc/ssh/sshd_config
+#               line="AuthenticationMethods publickey,keyboard-interactive"
+#               insertafter=EOF
+#               state=present
+              
+- name: remove password based authentication from PAM configuration
+  replace:  dest=/etc/pam.d/sshd
+            regexp="^auth       substack     password-auth"
+            replace="#auth       substack     password-auth"
+
+- name: add google authenticator to PAM configuration as requirement
   lineinfile: dest=/etc/pam.d/sshd
               line="auth required pam_google_authenticator.so"
-              insertbefore=BOF
+              insertafter=EOF
               state=present
 
 - name: restart SSH

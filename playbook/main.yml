@@ -4,8 +4,10 @@
 #
 # What it does:
 #
-# 1. Create new EC2 instance_type
-# 2. Install/Update yum dependencies
+# Create new EC2 instance_type
+# Create all the users / pub key pairs in the instance
+# Install/Update yum dependencies
+# 
 ##
 - hosts: local
   connection: local
@@ -28,12 +30,35 @@
   roles:
     - role: aws-ami
 
+- name: pull PAM from credstash
+  hosts: local
+  connection: local
+  gather_facts: no
+  roles:
+    - role: credstash-pull
+      users: "{{ usernames }}"
+
 - name: setup PAM for 2FA authentication for every user
   hosts: tmp_ami_group
+  become: true
   gather_facts: no
   roles:
     - role: pam-user
+      users_with_pam: "{{ hostvars['127.0.0.1']['kept_pams'] }}"
+      users_without_pam: "{{ hostvars['127.0.0.1']['users_to_gen_pam'] }}"
+
+- name: store PAM in credstash
+  hosts: local
+  connection: local
+  gather_facts: no
+  roles:
+    - role: credstash-push
+      gen_pams: "{{ hostvars[groups['tmp_ami_group'][0]].generated_pam | default({}) }}"
 
 - name: setup configuration for ssh daemon for PAM only access
   hosts: tmp_ami_group
+  become_user: root
+  become: true
   gather_facts: no
+  roles:
+    - role: pam-ssh-config

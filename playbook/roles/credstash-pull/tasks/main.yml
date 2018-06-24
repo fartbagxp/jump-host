@@ -1,0 +1,46 @@
+---
+####
+# - Pull a list of PAM keys from credstash.
+# - Remove old PAM keys from deleted users.
+# - Returns the PAM keys for current users.
+####
+- name: get the full list of credentials
+  shell: credstash getall
+  register: credentials
+  no_log: true
+  run_once: true
+
+- name: parse the credentials into json form
+  set_fact: 
+    pams: "{{ credentials.stdout | from_json }}"
+  no_log: true
+  run_once: true
+
+- name: get a list of users to delete from credstash
+  set_fact: 
+    users_to_delete: "{{ pams.keys() | difference(usernames) }}"
+  run_once: true
+
+- name: get a list of users to generate a bunch of PAM for
+  set_fact: 
+    users_to_gen_pam: "{{ usernames | difference(pams.keys()) }}"
+  run_once: true
+
+- name: remove any users removed from the public key list
+  shell: credstash delete '{{ item }}'
+  with_items: "{{ users_to_delete }}"
+  no_log: true
+  run_once: true
+
+- name: storage variable
+  set_fact:
+    kept_pams: {}
+  run_once: true
+
+- name: get a list of keys without the deleted users
+  set_fact:
+    kept_pams: "{{ kept_pams | combine({item.key: item.value}) }}"
+  when: item.key not in users_to_delete
+  with_dict: "{{ pams }}"
+  no_log: true
+  run_once: true

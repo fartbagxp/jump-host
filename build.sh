@@ -6,13 +6,12 @@ sudo yum update -y
 sudo yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
 sudo yum install google-authenticator
 
-# Add required to Google PAM
 # Add auth required pam_google_authenticator.so to last line
 # Comment out -> auth	    substack     password-auth
 sudo nano /etc/pam.d/sshd
 
 # Change ChallengeResponse to yes
-# Add AuthenticationMethods publickey,password publickey,keyboard-interactive to after ClientAlive Max 2
+# Add AuthenticationMethods publickey,password publickey,keyboard-interactive to last line
 sudo nano /etc/ssh/sshd_config
 
 # Restart ssh daemon
