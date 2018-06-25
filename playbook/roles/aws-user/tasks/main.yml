@@ -30,13 +30,13 @@
   set_fact:
     ssh_keys: []
 
-- name: store user keys
+- name: store user ssh keys from the public key files 
   set_fact:
     ssh_keys: "{{ ssh_keys }} + {{ [ lookup('file', '{{ item }}' ) ] }}"
   with_items: "{{ matched_paths }}"
   no_log: true
 
-- name: joined
+- name: concatenate all the ssh keys with a delimiter
   set_fact:
     joined_keys: "{{ ssh_keys|join(',') }}"
   no_log: true

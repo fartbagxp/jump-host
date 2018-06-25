@@ -5,11 +5,11 @@
               line="ChallengeResponseAuthentication yes"
               state=present
 
-# - name: update sshd config to enable authentication methods for keyboard-interactive
-#   lineinfile: dest=/etc/ssh/sshd_config
-#               line="AuthenticationMethods publickey,keyboard-interactive"
-#               insertafter=EOF
-#               state=present
+- name: update sshd config to enable authentication methods for keyboard-interactive
+  lineinfile: dest=/etc/ssh/sshd_config
+              line="AuthenticationMethods publickey,keyboard-interactive:pam"
+              insertafter=EOF
+              state=present
               
 - name: remove password based authentication from PAM configuration
   replace:  dest=/etc/pam.d/sshd

@@ -32,15 +32,17 @@
   no_log: true
   run_once: true
 
-- name: storage variable
-  set_fact:
-    kept_pams: {}
-  run_once: true
-
 - name: get a list of keys without the deleted users
   set_fact:
-    kept_pams: "{{ kept_pams | combine({item.key: item.value}) }}"
+    kept_pams: "{{ kept_pams | default({}) | combine({ item.key: item.value }) }}"
   when: item.key not in users_to_delete
   with_dict: "{{ pams }}"
+  no_log: true
+  run_once: true
+
+- name: ensure kept_pams is defined
+  set_fact:
+    kept_pams: {}
+  when: kept_pams is not defined
   no_log: true
   run_once: true
