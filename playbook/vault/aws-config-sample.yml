@@ -1,0 +1,14 @@
+# EC2 variables
+aws_access_key: 12345678901234567890
+aws_secret_key: 1234567890123456789012345678901234567890
+instance_type: t2.micro
+ami_id: ami-14c5486b
+region: us-east-1
+count: 1
+wait: true
+security_groups: sg-12345678
+vpc_subnet_id: subnet-12345678
+instance_tags: '{"Name":"jumpbox"}'
+launch_user_group: devops
+launch_user: user1
+app_name: jumpbox

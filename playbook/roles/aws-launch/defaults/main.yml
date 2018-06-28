@@ -1,0 +1,12 @@
+# default AWS linux
+timestamp: "{{ ansible_date_time.year }}{{ ansible_date_time.month }}{{ ansible_date_time.day }}{{ ansible_date_time.hour }}{{ ansible_date_time.minute }}{{ ansible_date_time.second }}"
+instance_name: "{{ app_name }}_ami-{{ timestamp }}"
+
+# AWS setup
+region: "{{ region }}"
+vpc_subnet_id: "{{ vpc_subnet_id }}"
+group_id: "{{ security_groups }}"
+image: "{{ ami_id }}"
+instance_type: "{{ instance_type }}"
+instance_tags: "{{ instance_tags }}"
+instance_profile_name: "{{ instance_role|default('') }}"
