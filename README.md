@@ -88,6 +88,8 @@ Alternatively, there's also an [AWS Bastion Host guide](https://aws.amazon.com/b
 
 1. **[Ansible]** Restart the SSH service.
 
+1. Pull each individual user's TOTP secret key by running the script `sh generate-QR.sh <username>`. For testing purposes, run `sh generate-QR.sh user1`.
+
 At this point, we have a bastion host that we can securely SSH into using the SSH key pair and the TOTP secret key.
 
 ![Multi-Factor Authentication with SSH](doc/google-auth)
