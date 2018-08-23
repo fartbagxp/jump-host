@@ -16,7 +16,9 @@ This repository serves as an example of a jump host / bastion host with an attem
 
 ## Development
 
-To develop in this repository, this is a list of pre-requistics to setup.
+### Prerequisites
+
+To develop in this repository, this is a list of prerequisites to setup.
 
 * Install [python 2.7](https://www.python.org/downloads/)
 
@@ -34,6 +36,8 @@ To develop in this repository, this is a list of pre-requistics to setup.
 ```
 
 * Install and setup [credstash](https://github.com/fugue/credstash) for storing Google TOTP secret key in [AWS DynamoDB](https://aws.amazon.com/dynamodb/).
+
+* Run `generate-keys.sh` to generate two users (`user1` and `user2`) in the public key repository for testing purposes.
 
 ## Developers
 
@@ -88,6 +92,8 @@ At this point, we have a bastion host that we can securely SSH into using the SS
 
 ![Multi-Factor Authentication with SSH](doc/google-auth)
 
+1. Pull each individual user's TOTP secret key by running the script `sh generate-QR.sh <username>`. For testing purposes, run `sh generate-QR.sh user1`.
+
 ## Process Detail
 
 These are some design consideration for the process that needs to be included in the deployment of a jump host.
@@ -105,18 +111,16 @@ These are some considerations for different teams to have as part of security gu
 
 * IP geofencing via security groups / firewall
 
-    The first line of defense in a public available server is usually the networking. This may or may not be possible for every team.
-    In AWS, modifying the [VPC's network access control list (ACL)](https://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/VPC_ACLs.html) would be one approach to doing something like this. However, bad actors may be able to simply VPN into a country of their choice to get around this restriction.
+    The first line of defense in a public available server is usually the firewall. This may or may not be possible for every team.
+    In AWS, modifying the [VPC's network access control list (ACL)](https://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/VPC_ACLs.html) would be one approach to doing something like this. However, bad actors may simply VPN into a country of their choice to get around this restriction.
 
-* Add [fail2Ban](https://github.com/fail2ban/fail2ban) as part of server installation. 
+* Add [Fail2Ban](https://github.com/fail2ban/fail2ban) as part of server installation. 
 
     This automatics the process of banning IPs with too many failed login attempts.
 
 * Continuous logging and monitoring of failed logs
 
     A large part of security requires vigilance on knowing what is out there. We never know when we'll get another [Meltdown](https://meltdownattack.com/) or [Spectre](https://meltdownattack.com/) on our servers, but we can monitor logs for it, and do geolocation lookups on suspicious activities.
-
-
 
 ## Questions I would have on this design
 
@@ -135,6 +139,8 @@ These are some considerations for different teams to have as part of security gu
 ## TODO
 
 1. Delete default ec2-user.
+
+1. Add defaults to some of the ansible roles.
 
 1. Better error handling.
 
