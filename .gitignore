@@ -188,3 +188,6 @@ playbook/.vault-pass.txt
 
 # more virtualenv folders?
 share/
+
+# personal generated keys
+playbook/roles/aws-user/public-keys/*.pub
