@@ -22,6 +22,8 @@ To develop in this repository, this is a list of pre-requistics to setup.
 
 * Install [python-pip](https://pypi.org/project/pip/)
 
+* Install [boto](https://github.com/boto/boto)
+
 * Run the script below to setup your [virtualenv](https://virtualenv.pypa.io/en/stable/) so [Ansible](https://www.ansible.com) can be installed with the project.
 
 ```sh
@@ -82,7 +84,7 @@ Alternatively, there's also an [AWS Bastion Host guide](https://aws.amazon.com/b
 
 1. **[Ansible]** Restart the SSH service.
 
-At this point, we have a bastion host that we can securely SSH using the SSH key pair and the TOTP secret key.
+At this point, we have a bastion host that we can securely SSH into using the SSH key pair and the TOTP secret key.
 
 ![Multi-Factor Authentication with SSH](doc/google-auth)
 
