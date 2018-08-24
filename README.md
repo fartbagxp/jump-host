@@ -122,7 +122,7 @@ These are some considerations for different teams to have as part of security gu
 
 * Continuous logging and monitoring of failed logs
 
-    A large part of security requires vigilance on knowing what is out there. We never know when we'll get another [Meltdown](https://meltdownattack.com/) or [Spectre](https://meltdownattack.com/) on our servers, but we can monitor logs for it, and do geolocation lookups on suspicious activities.
+    A large part of security requires vigilance on knowing what is out there. We never know when we'll get another [Meltdown](https://meltdownattack.com/) or [Spectre](https://meltdownattack.com/) vulnerability on our servers, but we can monitor logs for it, and do geolocation lookups on suspicious activities.
 
 ## Questions I would have on this design
 
@@ -136,7 +136,7 @@ These are some considerations for different teams to have as part of security gu
 
 1. `Is it okay for everybody on the team to know another person's TOTP secret key?`
 
-    This is a process and surface area question to security. The question is more personal to the team (Do you trust your teammates?). If you have a large team, in hundreds of people, and everybody has access to [credstash](https://github.com/fugue/credstash, storing the TOTP secret key in this fashion might not be a solution for you.
+    This is a policy and process question to security. The question is more personal to the team (Do you trust your teammates?). If you have a large team, in hundreds of people, and everybody has access to [credstash](https://github.com/fugue/credstash, storing the TOTP secret key in this fashion might not be a solution for you.
 
 ## TODO
 
