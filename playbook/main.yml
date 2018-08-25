@@ -30,6 +30,13 @@
   roles:
     - role: aws-ami
 
+- name: enable fail2ban
+  hosts: tmp_ami_group
+  become_user: root
+  become: true
+  roles:
+    - role: fail2ban
+
 - name: pull PAM from credstash
   hosts: local
   connection: local
