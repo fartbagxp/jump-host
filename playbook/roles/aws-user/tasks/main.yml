@@ -46,6 +46,7 @@
     launch_user_init_script: "{{ lookup('template', 'create_launch_script.sh') }}"
   no_log: true
 
+# pick a random user to use as the launch user, this may be a build server user in the future
 - name: export launch user
   set_fact:
     launch_user: "{{ usernames.0 }}"
