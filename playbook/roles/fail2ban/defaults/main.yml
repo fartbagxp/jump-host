@@ -1,28 +1,29 @@
----
-
-# Which log level should it be output as?
-# 1 = ERROR, 2 = WARN, 3 = INFO, 4 = DEBUG
-fail2ban_loglevel: 3
-
 # Where should log outputs be sent to?
 # SYSLOG, STDERR, STDOUT, file
-fail2ban_logtarget: /var/log/fail2ban.log
-
-# Where should the socket be created?
-fail2ban_socket: /var/run/fail2ban/fail2ban.sock
+fail2ban_logtarget: /var/log/secure
 
 # Which IP address, CIDR mark or DNS host should be ignored?
 fail2ban_ignoreip: 127.0.0.1/8
 
+fail2ban_jail_name: ssh
+
+# The mode of sshd modes for filter
+# normal (default), ddos, extra, or aggressive (combines all)
+fail2ban_mode: aggressive
+
+# Whether this jail should be enabled
+fail2ban_enabled: true
+
 # How long in seconds should the ban last for?
-fail2ban_bantime: 600
+# ex. 3600 seconds in an hour.
+fail2ban_bantime: 3600
 
 # How many times can they try before getting banned?
-fail2ban_maxretry: 6
+fail2ban_maxretry: 15
 
 # How should the file changes be detected?
 # gamin, polling, auto
-fail2ban_backend: polling
+fail2ban_backend: auto
 
 # How should the ban be applied?
 # iptables, iptables-new, iptables-multiport, shorewall, etc.
@@ -31,50 +32,5 @@ fail2ban_banaction: iptables-multiport
 # What should the default protocol be?
 fail2ban_protocol: tcp
 
-# Which chain would the JUMPs be added into iptables-*?
-fail2ban_chain: INPUT
-
-# What should the default ban action be?
-# action_, action_mw, action_mwl
-fail2ban_action: action_
-
-# What services should fail2ban monitor?
-# You can define fail2ban_services as an empty string to not monitor anything.
-# You can define multiple services as a standard yaml list.
-fail2ban_services:
-    # The name of the service
-    # REQUIRED.
-  - name: ssh
-
-    # Is it enabled?
-    # OPTIONAL: Defaults to "true" (must be a string).
-    enabled: "true"
-
-    # What port does the service use?
-    # Separate multiple ports with a comma, no spaces.
-    # REQUIRED.
-    port: ssh
-
-    # What protocol does the service use?
-    # OPTIONAL: Defaults to the protocol listed above.
-    protocol: tcp
-
-    # What filter should it use?
-    # REQUIRED.
-    filter: sshd
-
-    # Which log path should it monitor?
-    # REQUIRED.
-    logpath: /var/log/auth.log
-
-    # How many times can they try before getting banned?
-    # OPTIONAL: Defaults to the maxretry listed above.
-    maxretry: 6
-
-    # What should the default ban action be?
-    # OPTIONAL: Defaults to the action listed above.
-    action: action_
-
-    # How should the ban be applied?
-    # OPTIONAL: Defaults to the banaction listed above.
-    banaction: iptables-multiport
+# The filter to choose from: required.
+fail2ban_filter: sshd

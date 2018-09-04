@@ -38,7 +38,7 @@ ignorecommand =
 #       for which logs are present only in its own log files, specify some other
 #       backend for that jail (e.g. polling) and provide empty value for
 #       journalmatch. See https://github.com/fail2ban/fail2ban/issues/959#issuecomment-74901200
-backend = auto
+backend = {{ fail2ban_backend }}
 
 # "usedns" specifies if jails should trust hostnames in logs,
 #   warn when DNS lookups are performed, or ignore all hostnames in logs
@@ -86,7 +86,7 @@ sender = root@<fq-hostname>
 mta = sendmail
 
 # Default protocol
-protocol = tcp
+protocol = {{ fail2ban_protocol }}
 
 # Specify chain where jumps would need to be added in ban-actions expecting parameter chain
 chain = <known/chain>
@@ -171,17 +171,16 @@ action_abuseipdb = abuseipdb
 # SSH servers
 #
 
-[ssh]
+[{{ fail2ban_jail_name }}]
 
 # To use more aggressive sshd modes set filter parameter "mode" in jail.local:
 # normal (default), ddos, extra or aggressive (combines all).
 # See "tests/files/logs/sshd" or "filter.d/sshd.conf" for usage example and details.
-mode    = aggressive
-enabled = true
-port    = ssh
-logpath = /var/log/secure
-filter = sshd
-action = iptables-multiport[name=ssh]
-maxretry = 15
-bantime = 10m
-findtime = 10m
+mode    = {{ fail2ban_mode }}
+enabled = {{ fail2ban_enabled }}
+port    = {{ fail2ban_jail_name }}
+logpath = {{ fail2ban_logtarget }}
+filter = {{ fail2ban_filter }}
+action = {{ fail2ban_banaction }}[name={{ fail2ban_jail_name }}]
+maxretry = {{ fail2ban_maxretry }}
+bantime = {{ fail2ban_bantime }}
