@@ -1,20 +1,12 @@
----
-##
-# Creates an AMI with Google PAM. This is done to allow secure ssh with two factor authentication.
-#
-# What it does:
-#
-# Create new EC2 instance_type
-# Create all the users / pub key pairs in the instance
-# Install/Update yum dependencies
-# 
-##
+# ----------------------------------------------------------------------------------------------------------------
+# Setup an instance on AWS as an bastion host, including fail2ban, along with 2FA authentication with Google PAM.
+# ----------------------------------------------------------------------------------------------------------------
 - hosts: local
   connection: local
-  
+
   vars_files:
     - "vault/aws-config.yml"
-  
+
   roles:
     - role: aws-user
 
@@ -29,6 +21,13 @@
   become: true
   roles:
     - role: aws-ami
+
+- name: enable fail2ban
+  hosts: tmp_ami_group
+  become_user: root
+  become: true
+  roles:
+    - role: fail2ban
 
 - name: pull PAM from credstash
   hosts: local

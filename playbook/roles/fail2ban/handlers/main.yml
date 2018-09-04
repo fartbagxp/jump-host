@@ -1,0 +1,12 @@
+---
+- name: restart fail2ban
+  service:
+    name: fail2ban
+    state: restarted
+
+# Restart the rsyslog service because any change in timezone causes 
+# fail2ban filters to fail: https://stackoverflow.com/a/33959481
+- name: restart rsyslog
+  service:
+    name: rsyslog
+    state: restarted
