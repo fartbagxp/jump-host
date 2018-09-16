@@ -20,4 +20,7 @@ do
     echo "%${users[i]} ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers.d/"${users[i]}"
 done
 
+userdel ec2-user
+rm -rf /home/ec2-user
+
 IFS=$OIFS;

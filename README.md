@@ -147,11 +147,3 @@ These are some considerations for different teams to have as part of security gu
 - [Managing Linux users from AWS](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/managing-users.html)
 
 - [Google Authenticator Guide](https://wiki.archlinux.org/index.php/Google_Authenticator)
-
-## TODO
-
-1. Delete default ec2-user.
-
-1. Add defaults to some of the ansible roles.
-
-1. Better error handling.
