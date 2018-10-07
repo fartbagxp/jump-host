@@ -1,0 +1,20 @@
+# Fail2Ban filter file for an SSH server
+#
+
+[INCLUDES]
+
+# Read common prefixes. If any customization available -- read them from
+# common.local
+before = common.conf
+
+[Definition]
+
+# This will filter out ssh connections in /var/log/secure and 
+# all connections made of our geofence so that subsequent logins 
+# from those IP addresses will fail.
+# Example line: Oct  6 17:17:46 ip-172-31-40-30 sshd[10466]: Connection closed by 58.236.17.147 port 59767 [preauth]
+# Example line: Oct  6 18:01:45 ip-172-31-40-30 sshd[10626]: Did not receive identification string from 107.170.204.34 port 32850
+# Example line: Oct  6 15:03:44 ip-172-31-44-235 sshd[12639]: Invalid user something from 185.216.34.238 port 46622
+failregex = ^%(__prefix_line)sConnection closed by <HOST> port \d+ \[preauth\]$
+            ^%(__prefix_line)sDid not receive identification string from <HOST> port \d+\s*$
+            ^%(__prefix_line)sInvalid user (\w+) from <HOST> port \d+\s*$

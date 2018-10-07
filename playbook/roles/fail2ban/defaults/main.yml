@@ -1,18 +1,13 @@
+# fail2ban version
+fail2ban_version: 0.10.4
+
 # Where should log outputs be sent to?
 # SYSLOG, STDERR, STDOUT, file
 fail2ban_logtarget: /var/log/secure
 
-# Which IP address, CIDR mark or DNS host should be ignored?
-fail2ban_ignoreip: 127.0.0.1/8
-
-fail2ban_jail_name: ssh
-
 # The mode of sshd modes for filter
 # normal (default), ddos, extra, or aggressive (combines all)
 fail2ban_mode: aggressive
-
-# Whether this jail should be enabled
-fail2ban_enabled: true
 
 # How long in seconds should the ban last for?
 # ex. 3600 seconds in an hour.
@@ -25,12 +20,6 @@ fail2ban_maxretry: 15
 # gamin, polling, auto
 fail2ban_backend: auto
 
-# How should the ban be applied?
-# iptables, iptables-new, iptables-multiport, shorewall, etc.
-fail2ban_banaction: iptables-multiport
-
-# What should the default protocol be?
-fail2ban_protocol: tcp
-
-# The filter to choose from: required.
-fail2ban_filter: sshd
+# Which countries should be accepted?
+# Countries should be separated by "|"
+fail2ban_accept_country: US|United States

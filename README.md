@@ -14,6 +14,8 @@ A jump host acts as an intermediary to securely access these internal systems wh
 
 This repository serves as an example of a jump host / bastion host with an attempt on secure hardening and supports [Google Authenticator](https://github.com/google/google-authenticator) Time-based One-time Password (TOTP).
 
+For more on how we utilize Fail2ban, click **[here](doc/fail2ban.md)**.
+
 ## Development
 
 ### Prerequisites
@@ -111,7 +113,7 @@ These are some design consideration for the process that needs to be included in
 
 ## Security Surface
 
-These are some considerations for different teams to have as part of security guidelines for operating a jump host.
+These are some considerations for different teams to have as part of security guidelines for operating a bastion host to their environment.
 
 - IP geofencing via security groups / firewall
 
@@ -124,7 +126,9 @@ These are some considerations for different teams to have as part of security gu
 
 - Continuous logging and monitoring of failed logs
 
-  A large part of security requires vigilance on knowing what is out there. We never know when we'll get another [Meltdown](https://meltdownattack.com/) or [Spectre](https://meltdownattack.com/) vulnerability on our servers, but we can monitor logs for it, and do geolocation lookups on suspicious activities.
+  A large part of security requires vigilance on knowing what is out there. We never know when we'll get another [Meltdown](https://meltdownattack.com/) or [Spectre](https://meltdownattack.com/) vulnerability on our servers, but [we can monitor logs for it](https://aws.amazon.com/blogs/security/how-to-monitor-and-visualize-failed-ssh-access-attempts-to-amazon-ec2-linux-instances/), and do [geolocation lookups on suspicious activities](https://aws.amazon.com/blogs/security/how-to-use-amazon-guardduty-and-aws-web-application-firewall-to-automatically-block-suspicious-hosts/).
+
+- Leverage your Cloud Provider with on IAM role usage.
 
 ## Questions I would have on this design
 
@@ -138,7 +142,7 @@ These are some considerations for different teams to have as part of security gu
 
 1. `Is it okay for everybody on the team to know another person's TOTP secret key?`
 
-   This is a policy and process question to security. The question is more personal to the team (Do you trust your teammates?). If you have a large team, in hundreds of people, and everybody has access to [credstash](https://github.com/fugue/credstash, storing the TOTP secret key in this fashion might not be a solution for you.
+   This is a policy and process question to security. The question is more personal to the team (Do you trust your teammates?). If you have a large team, in hundreds of people, and everybody has access to [credstash](https://github.com/fugue/credstash), storing the TOTP secret key in this fashion might not be a solution for you.
 
 ## References
 
@@ -147,3 +151,11 @@ These are some considerations for different teams to have as part of security gu
 - [Managing Linux users from AWS](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/managing-users.html)
 
 - [Google Authenticator Guide](https://wiki.archlinux.org/index.php/Google_Authenticator)
+
+## Alternative Solution
+
+Alternate solutions which can also be incorporated into this environment:
+
+- Utilize [AWS System Manager (SSM)](https://docs.aws.amazon.com/systems-manager/latest/userguide/ssm-agent.html) for directly accessing a particular device.
+
+- [Jumpbox with AWS IAM Roles established](https://github.com/widdix/aws-ec2-ssh) so proper roles can be created personnel by personnel.

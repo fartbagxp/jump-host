@@ -1,5 +1,5 @@
 
-# Created by https://www.gitignore.io/api/linux,macos,python,ansible,windows,virtualenv
+# Created by https://www.gitignore.io/api/linux,macos,python,ansible,windows,virtualenv,visualstudiocode
 
 ### Ansible ###
 *.retry
@@ -181,7 +181,14 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
-# End of https://www.gitignore.io/api/linux,macos,python,ansible,windows,virtualenv
+### VisualStudioCode ###
+.vscode
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# End of https://www.gitignore.io/api/linux,macos,python,ansible,windows,virtualenv,visualstudiocode
 
 # passwords
 playbook/.vault-pass.txt
