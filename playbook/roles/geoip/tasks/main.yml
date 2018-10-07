@@ -1,0 +1,23 @@
+- name: install geoip lookup
+  yum:
+    name: geoip
+    state: latest
+
+- name: setup the download path
+  set_fact: 
+    geoip_download_path: "/tmp/GeoIP.dat.gz"
+    geoip_database_path: "/usr/share/GeoIP/GeoIP.dat"
+
+- name: download the latest Geolocation database for IPs
+  get_url:
+    url: "{{ maxmind_db_link }}"
+    dest: "{{ geoip_download_path }}"
+    mode: 0440
+
+- name: update the Geolocation database for IPs
+  shell: gunzip < {{ geoip_download_path }} > {{ geoip_database_path }}
+
+- name: clean up Geolocation database
+  file:
+    path: "{{ geoip_download_path }}"
+    state: absent

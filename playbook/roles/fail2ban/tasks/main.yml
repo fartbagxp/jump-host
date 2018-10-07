@@ -1,41 +1,56 @@
----
 # The default fail2ban package in Redhat EPEL packages is 0.8.10,
 # last updated in 2013.
 # - name: ensure fail2ban is installed
-#   yum: 
+#   yum:
 #     name: fail2ban
 #     state: latest
 
 - name: unarchive fail2ban
   unarchive:
-    src: https://github.com/fail2ban/fail2ban/archive/0.10.3.1.tar.gz
+    src: https://github.com/fail2ban/fail2ban/archive/{{ fail2ban_version }}.tar.gz
     dest: /tmp/
     remote_src: yes
 
 - name: install fail2ban
   shell: python setup.py install --install-scripts=/usr/bin
   args:
-    chdir: /tmp/fail2ban-0.10.3.1
+    chdir: /tmp/fail2ban-{{ fail2ban_version }}
 
 - name: copy the startup script for starting on reboot
-  copy: 
-    src: /tmp/fail2ban-0.10.3.1/files/redhat-initd 
+  copy:
+    src: /tmp/fail2ban-{{ fail2ban_version }}/files/redhat-initd
     dest: /etc/init.d/fail2ban
     remote_src: yes
     mode: 655
 
 - name: ensure fail2ban is configured for jail
-  template: 
+  template:
     src: jail.conf.j2
     dest: /etc/fail2ban/jail.local
   notify:
     - restart fail2ban
     - restart rsyslog
 
-- name: ensure fail2ban is configured for iptable actions
-  template: 
-    src: iptables-multiport.conf.j2
-    dest: /etc/fail2ban/action.d/iptables-multiport.local
+- name: ensure fail2ban is configured for iptable actions for SSH
+  template:
+    src: action/iptables-ssh.conf.j2
+    dest: /etc/fail2ban/action.d/iptables-ssh.local
+  notify:
+    - restart fail2ban
+    - restart rsyslog
+
+- name: ensure fail2ban is configured for iptable filters for geofencing IP addresses
+  template:
+    src: filter/geoip-fence.conf.j2
+    dest: /etc/fail2ban/filter.d/geoip-fence.local
+  notify:
+    - restart fail2ban
+    - restart rsyslog
+
+- name: ensure fail2ban is configured for iptable actions for geofencing IP addresses
+  template:
+    src: action/iptables-geoip-fence.conf.j2
+    dest: /etc/fail2ban/action.d/iptables-geoip-fence.local
   notify:
     - restart fail2ban
     - restart rsyslog
