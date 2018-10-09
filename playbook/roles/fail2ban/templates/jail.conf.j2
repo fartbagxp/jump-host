@@ -175,3 +175,9 @@ filter   = geoip-fence
 bantime  = 604800  ; 1 week
 findtime = 86400   ; 1 day
 maxretry = 1
+
+# cache max 100 ips for max 5 minutes:
+ignorecache = key="<ip>", max-count=100, max-time=5m
+
+# ignore IPs from country_list (returns 0 if ignore, 1 otherwise):
+ignorecommand =  COUNTRY=$(geoiplookup "<ip>" | egrep "{{ fail2ban_accept_country }}"); if [ "$COUNTRY" == "" ]; then exit 1; fi; exit 0

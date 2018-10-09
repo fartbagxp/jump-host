@@ -40,9 +40,7 @@ actioncheck = iptables -n -L <chain> | grep -q 'f2b-<name>[ \t]'
 # Tags:    See jail.conf(5) man page
 # Values:  CMD
 #
-actionban = IP=<ip> &&
-            COUNTRY=$(geoiplookup $IP | egrep "<country_list>") && [ "$COUNTRY" ] ||
-            (iptables -I f2b-<name> 1 -s <ip> -j <blocktype>)
+actionban = iptables -I f2b-<name> 1 -s <ip> -j <blocktype>
 
 # Option:  actionunban
 # Notes.:  command executed when unbanning an IP. Take care that the
@@ -50,17 +48,9 @@ actionban = IP=<ip> &&
 # Tags:    See jail.conf(5) man page
 # Values:  CMD
 #
-actionunban = IP=<ip> &&
-              COUNTRY=$(geoiplookup $IP | egrep "<country_list>") && [ "$COUNTRY" ] ||
-              (iptables -D f2b-<name> -s <ip> -j <blocktype>)
+actionunban = iptables -D f2b-<name> -s <ip> -j <blocktype>
 
 [Init]
-
-# Option:  country_list
-# Notes.:  List of exempted countries separated by pipe "|"
-# Values:  STR  Default:
-#
-country_list = {{ fail2ban_accept_country }}
 
 # Default name of the chain
 #
