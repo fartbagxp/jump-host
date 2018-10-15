@@ -7,34 +7,67 @@
   vars_files:
     - "vault/aws-config.yml"
 
-  roles:
-    - role: aws-user
+#   roles:
+#     - role: aws-user
 
-    - role: aws-launch
-      playbook_group: "tmp_ami_group"
-      ami_user: "{{ launch_user }}"
-      user_data: "{{ launch_user_init_script }}"
+#     - role: aws-launch
+#       playbook_group: "tmp_ami_group"
+#       ami_user: "{{ launch_user }}"
+#       user_data: "{{ launch_user_init_script }}"
 
-- name: update all packages in a launched EC2 instance.
-  hosts: tmp_ami_group
-  become_user: root
-  become: true
-  roles:
-    - role: aws-ami
+# - name: update all packages in a launched EC2 instance.
+#   hosts: tmp_ami_group
+#   become_user: root
+#   become: true
+#   roles:
+#     - role: aws-ami
 
-- name: setup geoip database
-  hosts: tmp_ami_group
-  become_user: root
-  become: true
-  roles:
-    - role: geoip
+# - name: setup geoip database
+#   hosts: tmp_ami_group
+#   become_user: root
+#   become: true
+#   roles:
+#     - role: geoip
 
-- name: enable fail2ban
-  hosts: tmp_ami_group
-  become_user: root
-  become: true
-  roles:
-    - role: fail2ban
+# - name: enable fail2ban
+#   hosts: tmp_ami_group
+#   become_user: root
+#   become: true
+#   roles:
+#     - role: fail2ban
+
+# - name: pull PAM from credstash
+#   hosts: local
+#   connection: local
+#   gather_facts: no
+#   roles:
+#     - role: credstash-pull
+#       users: "{{ usernames }}"
+
+# - name: setup PAM for 2FA authentication for every user
+#   hosts: tmp_ami_group
+#   become: true
+#   gather_facts: no
+#   roles:
+#     - role: pam-user
+#       users_with_pam: "{{ hostvars['127.0.0.1']['kept_pams'] }}"
+#       users_without_pam: "{{ hostvars['127.0.0.1']['users_to_gen_pam'] }}"
+
+# - name: store PAM in credstash
+#   hosts: local
+#   connection: local
+#   gather_facts: no
+#   roles:
+#     - role: credstash-push
+#       gen_pams: "{{ hostvars[groups['tmp_ami_group'][0]].generated_pam | default({}) }}"
+
+# - name: setup configuration for ssh daemon for PAM only access
+#   hosts: tmp_ami_group
+#   become_user: root
+#   become: true
+#   gather_facts: no
+#   roles:
+#     - role: pam-ssh-config
 
 - name: pull PAM from credstash
   hosts: local
@@ -42,29 +75,3 @@
   gather_facts: no
   roles:
     - role: credstash-pull
-      users: "{{ usernames }}"
-
-- name: setup PAM for 2FA authentication for every user
-  hosts: tmp_ami_group
-  become: true
-  gather_facts: no
-  roles:
-    - role: pam-user
-      users_with_pam: "{{ hostvars['127.0.0.1']['kept_pams'] }}"
-      users_without_pam: "{{ hostvars['127.0.0.1']['users_to_gen_pam'] }}"
-
-- name: store PAM in credstash
-  hosts: local
-  connection: local
-  gather_facts: no
-  roles:
-    - role: credstash-push
-      gen_pams: "{{ hostvars[groups['tmp_ami_group'][0]].generated_pam | default({}) }}"
-
-- name: setup configuration for ssh daemon for PAM only access
-  hosts: tmp_ami_group
-  become_user: root
-  become: true
-  gather_facts: no
-  roles:
-    - role: pam-ssh-config

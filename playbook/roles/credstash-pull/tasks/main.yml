@@ -4,45 +4,49 @@
 # - Remove old PAM keys from deleted users.
 # - Returns the PAM keys for current users.
 ####
+
 - name: get the full list of credentials
-  shell: credstash getall
-  register: credentials
-  no_log: true
+  set_fact: 
+    users: "{{ lookup('credstash', 'dev.users') | from_json }}"
+  # no_log: true
   run_once: true
 
-- name: parse the credentials into json form
-  set_fact: 
-    pams: "{{ credentials.stdout | from_json }}"
-  no_log: true
+- name: get a full list of users
+  debug: 
+    msg: "Keys list: {{ users.keys() }}"
   run_once: true
 
 - name: get a list of users to delete from credstash
   set_fact: 
-    users_to_delete: "{{ pams.keys() | difference(usernames) }}"
+    users_to_delete: "{{ users.keys() | difference(new_users) }}"
   run_once: true
 
-- name: get a list of users to generate a bunch of PAM for
+- name: get a list of users to generate 2FA/PAM key
   set_fact: 
-    users_to_gen_pam: "{{ usernames | difference(pams.keys()) }}"
+    users_to_gen_pam: "{{ new_users | difference(users.keys()) }}"
   run_once: true
 
-- name: remove any users removed from the public key list
-  shell: credstash delete '{{ item }}'
-  with_items: "{{ users_to_delete }}"
-  no_log: true
-  run_once: true
+- name: build new credstash list with remaining users
+  debug:
+    msg: "todo"
 
-- name: get a list of keys without the deleted users
-  set_fact:
-    kept_pams: "{{ kept_pams | default({}) | combine({ item.key: item.value }) }}"
-  when: item.key not in users_to_delete
-  with_dict: "{{ pams }}"
-  no_log: true
-  run_once: true
+# - name: remove any users removed from the public key list
+#   shell: credstash delete '{{ item }}'
+#   with_items: "{{ users_to_delete }}"
+#   no_log: true
+#   run_once: true
 
-- name: ensure kept_pams is defined
-  set_fact:
-    kept_pams: {}
-  when: kept_pams is not defined
-  no_log: true
-  run_once: true
+# - name: get a list of keys without the deleted users
+#   set_fact:
+#     kept_pams: "{{ kept_pams | default({}) | combine({ item.key: item.value }) }}"
+#   when: item.key not in users_to_delete
+#   with_dict: "{{ pams }}"
+#   no_log: true
+#   run_once: true
+
+# - name: ensure kept_pams is defined
+#   set_fact:
+#     kept_pams: {}
+#   when: kept_pams is not defined
+#   no_log: true
+#   run_once: true

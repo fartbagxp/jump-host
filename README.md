@@ -22,6 +22,8 @@ For more on how we utilize Fail2ban, click **[here](doc/fail2ban.md)**.
 
 To develop in this repository, this is a list of prerequisites to setup.
 
+- Install [aws-cli](https://docs.aws.amazon.com/cli/latest/userguide/installing.html)
+
 - Install [python 2.7](https://www.python.org/downloads/)
 
 - Install [python-pip](https://pypi.org/project/pip/)
@@ -32,12 +34,10 @@ To develop in this repository, this is a list of prerequisites to setup.
 
 ```sh
     cd playbook
-    virtualenv .
-    source ./bin/activate
+    virtualenv .venv
+    source .venv/bin/activate
     pip install -r requirements.txt
 ```
-
-- Install and setup [credstash](https://github.com/fugue/credstash) for storing Google TOTP secret key in [AWS DynamoDB](https://aws.amazon.com/dynamodb/).
 
 - Run `generate-keys.sh` to generate two users (`user1` and `user2`) in the public key repository for testing purposes.
 
