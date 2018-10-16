@@ -1,52 +1,42 @@
----
 ####
 # - Pull a list of PAM keys from credstash.
 # - Remove old PAM keys from deleted users.
 # - Returns the PAM keys for current users.
 ####
+- name: debug username
+  debug:
+    msg: "New users: {{ new_users }}"
 
 - name: get the full list of credentials
-  set_fact: 
+  set_fact:
     users: "{{ lookup('credstash', 'dev.users') | from_json }}"
   # no_log: true
   run_once: true
 
 - name: get a full list of users
-  debug: 
+  debug:
     msg: "Keys list: {{ users.keys() }}"
   run_once: true
 
-- name: get a list of users to delete from credstash
-  set_fact: 
+- name: build a list of users set for deletion, and set to be generated for 2FA
+  set_fact:
     users_to_delete: "{{ users.keys() | difference(new_users) }}"
-  run_once: true
-
-- name: get a list of users to generate 2FA/PAM key
-  set_fact: 
     users_to_gen_pam: "{{ new_users | difference(users.keys()) }}"
+    users_in_credstash: {}
   run_once: true
 
 - name: build new credstash list with remaining users
+  set_fact:
+    users_in_credstash: "{{ users_in_credstash | combine({item.key: item.value})}}"
+  when: item.key not in [ users_to_delete ]
+  with_dict: "{{ users }}"
+
+- name: debug
   debug:
-    msg: "todo"
+    msg: "Dict 2 = {{ users_in_credstash | to_json }}"
 
-# - name: remove any users removed from the public key list
-#   shell: credstash delete '{{ item }}'
-#   with_items: "{{ users_to_delete }}"
-#   no_log: true
-#   run_once: true
+- name: delete the credstash list
+  shell: credstash delete dev.users
 
-# - name: get a list of keys without the deleted users
-#   set_fact:
-#     kept_pams: "{{ kept_pams | default({}) | combine({ item.key: item.value }) }}"
-#   when: item.key not in users_to_delete
-#   with_dict: "{{ pams }}"
-#   no_log: true
-#   run_once: true
-
-# - name: ensure kept_pams is defined
-#   set_fact:
-#     kept_pams: {}
-#   when: kept_pams is not defined
-#   no_log: true
-#   run_once: true
+- name: put the new credstash list with remaining users
+  shell: credstash put dev.users "{{ users_in_credstash | to_json }}"
