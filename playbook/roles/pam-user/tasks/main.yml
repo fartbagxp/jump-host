@@ -1,22 +1,25 @@
 # Restore available PAM pair onto the server.
 # Generate new PAM pair for new users without PAM pair.
 # Store new PAM pairs into credstash.
+- name: restore template file as user PAM template file
+  template:
+    src: .google_authenticator.j2
+    dest: /home/{{ item.key }}/.google_authenticator
+  with_dict: "{{ user_with_pam }}"
+  when: user_with_pam is defined
 
-- name: restore all PAM data from stored data
+  # modify the first line with key
+- name: restore all PAM key from stored data
   shell: echo '{{ item.value }}' >> /home/{{ item.key }}/.google_authenticator
   with_dict: "{{ users_with_pam }}"
   when: users_with_pam is defined
   # no_log: true
 
 - name: get a list of all new users to create a PAM for
-  shell: google-authenticator -q -t -d -f -r 3 -R 30 -w 17 -s /home/{{ item }}/.google_authenticator
+  shell: google-authenticator -q -t -d -f -r {{ rate_limit }} -R {{ rate_time_in_sec }} -w {{ valid_code_window }} -s /home/{{ item }}/.google_authenticator
   with_items: "{{ users_without_pam }}"
   when: users_without_pam is defined
   # no_log: true
-
-- name: combine both user lists
-  set_fact:
-    users: "{{ users_with_pam.keys() | union(users_without_pam) }}"
 
 # Delete all emergency codes for more restrictive security.
 - name: modify PAM auth files to delete emergency codes
@@ -24,13 +27,30 @@
     path: /home/{{ item }}/.google_authenticator
     state: absent
     regexp: "[0-9]{8}"
-  with_items: "{{ users }}"
+  with_items: "{{ users_without_pam }}"
+  when: users_without_pam is defined
 
+- name: combine both user lists
+  set_fact:
+    users: "{{ users_with_pam.keys() | union(users_without_pam) }}"
+
+# TODO: We only need the first line of the PAM
 - name: use an alternate way to read the PAM
   shell: cat /home/{{ item }}/.google_authenticator
-  register: task
+  register: keys
   with_items: "{{ users }}"
   no_log: true
+
+- name: store the generated PAMs
+  set_fact:
+    generated_pam: "{{ generated_pam | default({}) | combine( {item.item: item.stdout} ) }}"
+  when: item.item in users_without_pam
+  with_items: "{{ keys.results }}"
+  # no_log: true
+
+- name: debug generated_pam
+  debug:
+    msg: "generated_pam = {{ generated_pam }}"
 
 - name: change permission on all PAM
   file:
@@ -39,14 +59,3 @@
     group: "{{ item }}"
     mode: 0400
   with_items: "{{ users }}"
-
-- name: store the generated PAMs
-  set_fact:
-    generated_pam: "{{ generated_pam | default({}) | combine( {item.item: item.stdout} ) }}"
-  when: item.item in users_without_pam
-  with_items: "{{ task.results }}"
-  # no_log: true
-
-- name: debug generated_pam
-  debug:
-    msg: "generated_pam = {{ generated_pam }}"

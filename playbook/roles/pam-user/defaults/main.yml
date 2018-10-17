@@ -1,0 +1,5 @@
+# google libpam variables can be found here:
+# https://github.com/google/google-authenticator-libpam/blob/master/man/google-authenticator.1.md
+rate_limit: 3
+rate_time_in_sec: 30
+valid_code_window: 3

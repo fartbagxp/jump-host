@@ -30,19 +30,19 @@
   roles:
     - role: aws-ami
 
-- name: setup geoip database
-  hosts: tmp_ami_group
-  become_user: root
-  become: true
-  roles:
-    - role: geoip
+# - name: setup geoip database
+#   hosts: tmp_ami_group
+#   become_user: root
+#   become: true
+#   roles:
+#     - role: geoip
 
-- name: enable fail2ban
-  hosts: tmp_ami_group
-  become_user: root
-  become: true
-  roles:
-    - role: fail2ban
+# - name: enable fail2ban
+#   hosts: tmp_ami_group
+#   become_user: root
+#   become: true
+#   roles:
+#     - role: fail2ban
 
 - name: pull PAM from credstash
   hosts: local
