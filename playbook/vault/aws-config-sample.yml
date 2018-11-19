@@ -12,3 +12,6 @@ instance_tags: '{"Name":"jumpbox"}'
 launch_user_group: devops
 launch_user: user1
 app_name: jumpbox
+
+# Credstash
+credstash_table: credential-store

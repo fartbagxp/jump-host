@@ -36,13 +36,16 @@
   roles:
     - role: fail2ban
 
-- name: pull PAM from credstash
+- name: pull user PAMs from credstash
   hosts: local
   connection: local
   gather_facts: no
+  vars_files:
+    - "vault/aws-config.yml"
   roles:
     - role: credstash-pull
-      users: "{{ usernames }}"
+      new_users: "{{ usernames }}"
+      credstash_store: "{{ credstash_table|default('credential-store') }}"
 
 - name: setup PAM for 2FA authentication for every user
   hosts: tmp_ami_group
@@ -50,16 +53,19 @@
   gather_facts: no
   roles:
     - role: pam-user
-      users_with_pam: "{{ hostvars['127.0.0.1']['kept_pams'] }}"
+      users_with_pam: "{{ hostvars['127.0.0.1']['users_in_credstash'] }}"
       users_without_pam: "{{ hostvars['127.0.0.1']['users_to_gen_pam'] }}"
 
 - name: store PAM in credstash
   hosts: local
   connection: local
   gather_facts: no
+  vars_files:
+    - "vault/aws-config.yml"
   roles:
     - role: credstash-push
       gen_pams: "{{ hostvars[groups['tmp_ami_group'][0]].generated_pam | default({}) }}"
+      credstash_store: "{{ credstash_table|default('credential-store') }}"
 
 - name: setup configuration for ssh daemon for PAM only access
   hosts: tmp_ami_group

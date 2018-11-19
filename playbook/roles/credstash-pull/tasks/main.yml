@@ -4,18 +4,33 @@
 # - Remove old PAM keys from deleted users.
 # - Returns the PAM keys for current users.
 ####
+
+# Ignore errors because credstash returns errors if 
+# there are no key/value pair in the table
 - name: get the full list of credentials
-  shell: credstash getall
+  shell: credstash -t "{{ credstash_store }}" getall
   register: credentials
   no_log: true
   run_once: true
+  ignore_errors: true
 
 - name: parse the credentials into json form
   set_fact: 
     pams: "{{ credentials.stdout | from_json }}"
   no_log: true
   run_once: true
+  when: credentials.stdout is defined and credentials.stdout != ''
 
+- name: parse the credentials into json form if no credentials are available
+  set_fact: 
+    pams: "{{ '{}' | from_json }}"
+  no_log: true
+  run_once: true
+  when: credentials.stdout is undefined or credentials.stdout == ''
+
+- name: check debug for variables
+  debug: msg="table={{ credstash_store }}, usernames={{ usernames }}, pam.keys()={{ pams.keys() }}"
+  
 - name: get a list of users to delete from credstash
   set_fact: 
     users_to_delete: "{{ pams.keys() | difference(usernames) }}"
@@ -27,22 +42,22 @@
   run_once: true
 
 - name: remove any users removed from the public key list
-  shell: credstash delete '{{ item }}'
+  shell: credstash -t "{{ credstash_store }}" delete '{{ item }}'
   with_items: "{{ users_to_delete }}"
   no_log: true
   run_once: true
 
 - name: get a list of keys without the deleted users
   set_fact:
-    kept_pams: "{{ kept_pams | default({}) | combine({ item.key: item.value }) }}"
+    users_in_credstash: "{{ users_in_credstash | default({}) | combine({ item.key: item.value }) }}"
   when: item.key not in users_to_delete
   with_dict: "{{ pams }}"
   no_log: true
   run_once: true
 
-- name: ensure kept_pams is defined
+- name: ensure users_in_credstash is defined
   set_fact:
-    kept_pams: {}
-  when: kept_pams is not defined
+    users_in_credstash: {}
+  when: users_in_credstash is not defined
   no_log: true
   run_once: true
