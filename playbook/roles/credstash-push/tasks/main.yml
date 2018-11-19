@@ -1,9 +1,8 @@
-- name: Test debug
-  debug:
-    msg: "gem pams: {{ gen_pams }}"
-
-# - name: store all PAMs for current users in credstash
-#   shell: credstash put dev.users "{{ item.value }}"
-#   when: gen_pams is defined
-#   with_dict: "{{ gen_pams }}"
-#   no_log: true
+####
+# - Push all the newly generated PAM files into credstash
+####
+- name: store all PAMs for current users in credstash
+  shell: credstash -t '{{ credstash_store }}' put '{{ item.key }}' '{{ item.value }}'
+  when: gen_pams is defined
+  with_dict: "{{ gen_pams }}"
+  no_log: true

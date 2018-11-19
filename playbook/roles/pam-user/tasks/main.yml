@@ -13,13 +13,13 @@
   shell: echo '{{ item.value }}' >> /home/{{ item.key }}/.google_authenticator
   with_dict: "{{ users_with_pam }}"
   when: users_with_pam is defined
-  # no_log: true
+  no_log: true
 
 - name: get a list of all new users to create a PAM for
   shell: google-authenticator -q -t -d -f -r {{ rate_limit }} -R {{ rate_time_in_sec }} -w {{ valid_code_window }} -s /home/{{ item }}/.google_authenticator
   with_items: "{{ users_without_pam }}"
   when: users_without_pam is defined
-  # no_log: true
+  no_log: true
 
 # Delete all emergency codes for more restrictive security.
 - name: modify PAM auth files to delete emergency codes
@@ -29,12 +29,12 @@
     regexp: "[0-9]{8}"
   with_items: "{{ users_without_pam }}"
   when: users_without_pam is defined
+  no_log: true
 
 - name: combine both user lists
   set_fact:
     users: "{{ users_with_pam.keys() | union(users_without_pam) }}"
 
-# TODO: We only need the first line of the PAM
 - name: use an alternate way to read the PAM
   shell: cat /home/{{ item }}/.google_authenticator
   register: keys
@@ -46,11 +46,7 @@
     generated_pam: "{{ generated_pam | default({}) | combine( {item.item: item.stdout} ) }}"
   when: item.item in users_without_pam
   with_items: "{{ keys.results }}"
-  # no_log: true
-
-- name: debug generated_pam
-  debug:
-    msg: "generated_pam = {{ generated_pam }}"
+  no_log: true
 
 - name: change permission on all PAM
   file:

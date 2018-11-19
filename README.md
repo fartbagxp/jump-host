@@ -18,7 +18,7 @@ For more on how we utilize Fail2ban, click **[here](doc/fail2ban.md)**.
 
 ## Development
 
-### Prerequisites
+### Prerequisites and Setup
 
 To develop in this repository, this is a list of prerequisites to setup.
 
@@ -41,6 +41,11 @@ To develop in this repository, this is a list of prerequisites to setup.
 
 - Run `generate-keys.sh` to generate two users (`user1` and `user2`) in the public key repository for testing purposes.
 
+- [Credstash](https://github.com/fugue/credstash) is installed as part of the requirements. Run `credstash -h` to find the command line support.
+
+- (Optional) For projects already using [credstash](https://github.com/fugue/credstash), we might want to isolate the Google PAM storage into another DynamoDB table. The configuration is stored in the [vault configuration file](playbook/vault/aws-config.yml) when running the scripts.
+Instructions on how to do that can be found [here](doc/how-to-create-an-dynamodb-table.md).
+
 ## Developers
 
 The `vault` aws-config file is encrypted to keys I use, there's a sample version of it that you can use and rename to `aws-config.yml` in the same folder.
@@ -54,7 +59,9 @@ cd playbook
 sh run.sh
 ```
 
-### How to terminate
+### How to terminate existing jumpbox instances
+
+The script will terminate any instance with the selected "jumpbox" tag.
 
 ```sh
 cd playbook
@@ -100,7 +107,7 @@ At this point, we have a bastion host that we can securely SSH into using the SS
 
 1. Pull each individual user's TOTP secret key by running the script `sh generate-QR.sh <username>`. For testing purposes, run `sh generate-QR.sh user1`.
 
-## Process Detail
+## Design Consideration
 
 These are some design consideration for the process that needs to be included in the deployment of a jump host.
 
