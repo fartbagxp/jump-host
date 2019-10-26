@@ -1,3 +1,8 @@
+This repository is now archived. While jumpboxes/bastion hosts are useful and the chances of compromise is low from the outside, it leaves a lot to maintain for a small development team.  
+For AWS, users should consider using [System Manager](https://docs.aws.amazon.com/en_pv/systems-manager/latest/userguide/session-manager.html) while strengthening IAM roles to ensure all calls are multi-factored authenticated.  
+
+MFA remains a key factor in strengthening the security posture, as [Microsoft has stated that MFA is 99.9% effective](https://www.microsoft.com/security/blog/2019/08/20/one-simple-action-you-can-take-to-prevent-99-9-percent-of-account-attacks/). Along with SSO, network protection (firewalls, WAF, etc), access should have a suite or protections to ensure defense-in-depth.
+
 # Overview
 
 [Bastion Host](https://en.wikipedia.org/wiki/Bastion_host) or [jump host / jumpbox](https://en.wikipedia.org/wiki/Jump_server), works as a dedicated server used as a central point for providing access to internal network.
